@@ -1,0 +1,13 @@
+# List of repositories to monitor.
+# Each entry:
+#   name:  display name in the Discord report
+#   path:  absolute local path to the repo (used for git status / diff)
+#   skip:  (optional) list of checks to skip — local, pr, issue, ci
+
+repos:
+  - name: my-project
+    path: /Users/you/code/my-project
+
+  - name: another-repo
+    path: /Users/you/code/another-repo
+    skip: [ci]   # skip CI status for this one

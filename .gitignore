@@ -1,0 +1,18 @@
+# Personal data — never commit
+.env
+repos.yaml
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+.pytest_cache/
+
+# OS
+.DS_Store
+
+# Logs
+*.log
+logs/
