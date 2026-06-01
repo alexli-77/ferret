@@ -17,6 +17,10 @@ import yaml
 
 ROOT = Path(__file__).resolve().parent
 ENV_FILE = ROOT / ".env"
+SHARED_ENV_FILES = (
+    Path.home() / ".hermes" / "secrets" / "discord.env",
+    Path.home() / ".openclaw" / "secrets" / "discord.env",
+)
 REPOS_FILE = ROOT / "repos.yaml"
 DISCORD_API = "https://discord.com/api/v10"
 MAX_MESSAGE_CHARS = 1900  # leave headroom below Discord's 2000 cap
@@ -25,18 +29,20 @@ MAX_MESSAGE_CHARS = 1900  # leave headroom below Discord's 2000 cap
 # ---------- config loading ----------
 
 def load_env() -> dict[str, str]:
-    if not ENV_FILE.exists():
-        sys.exit(f"missing {ENV_FILE} — copy .env.example and fill it in")
     env: dict[str, str] = {}
-    for raw in ENV_FILE.read_text().splitlines():
-        line = raw.strip()
-        if not line or line.startswith("#") or "=" not in line:
+    for env_file in (*SHARED_ENV_FILES, ENV_FILE):
+        if not env_file.exists():
             continue
-        key, _, value = line.partition("=")
-        env[key.strip()] = value.strip().strip('"').strip("'")
+        for raw in env_file.read_text().splitlines():
+            line = raw.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            key, _, value = line.partition("=")
+            env[key.strip()] = value.strip().strip('"').strip("'")
     for required in ("DISCORD_BOT_TOKEN", "DISCORD_CHANNEL_ID"):
         if not env.get(required):
-            sys.exit(f"{required} missing in {ENV_FILE}")
+            shared = " or ".join(str(path) for path in SHARED_ENV_FILES)
+            sys.exit(f"{required} missing in {shared} or {ENV_FILE}")
     return env
 
 
